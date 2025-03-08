@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend  # ใช้ Dockerfile ในโฟลเดอร์ backend
+    container_name: backend_app
+    ports:
+      - "8091:8091"
+    environment:
+      - API_KEY="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"  # Pass API key as env var
+      - API_BASE="https://openrouter.ai/api/v1"
+    tty: true
+    stdin_open: true
+
+  frontend:
+    build: ./frontend  # ใช้ Dockerfile ในโฟลเดอร์ frontend
+    container_name: frontend_app
+    ports:
+      - "8090:8090"
+    environment:
+      - BACKEND_URL=http://backend:8091  # เชื่อมต่อกับ backend
+    depends_on:
+      - backend
