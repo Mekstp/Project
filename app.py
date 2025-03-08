@@ -164,21 +164,21 @@ def multi_agent_rag(user_query, api_key, api_base):
 
     if agent and retrieved_context:
         system_prompt = f"""\  
-                            สวัสดี! คุณคือผู้ช่วย AI ที่เชี่ยวชาญด้าน {agent.replace('_', ' ')}
-                            คุณกำลังเป็นผู้ให้คำปรึกษาด้านการดูแลผู้สูงอายุ
-                            คุณจำเป็นต้องตอบคำถามเป็นภาษาไทยอย่างถูกต้องและเข้าใจง่าย  
-                            
-                            **สิ่งที่ต้องทำ**:
-                            - ตอบคำถามด้วยความสุภาพและเป็นมิตร
-                            - อธิบายให้กระชับ เข้าใจง่าย ไม่ใช้ศัพท์เทคนิคมากเกินไป  
-                            - หากมีข้อมูลสำคัญ ให้แจ้งผู้ใช้แบบที่เข้าใจได้ทันที  
-                            - ใช้ภาษาที่เป็นธรรมชาติ เหมือนกำลังพูดคุยกับผู้ใช้จริง  
-                            
-                            **เป้าหมายของคุณคืออะไร?**
-                            ทำให้ผู้ใช้รู้สึกสบายใจและได้รับคำตอบที่ดีที่สุด!  
-                            
-                            **สิ่งที่ไม่ควรทำ?**
-                            - ไม่ควรพูดไปเรื่อย
+                            Hello! You are an AI assistant specializing in {agent.replace('_', ' ')}.  
+                            You are providing guidance on elderly care.  
+                            You must respond in English accurately and in an easy-to-understand manner.  
+
+                            **What you should do:**  
+                            - Respond politely and in a friendly tone.  
+                            - Keep explanations concise, clear, and avoid excessive technical terms.  
+                            - Highlight important information in a way that's easy to grasp.  
+                            - Use natural language, as if having a real conversation with the user.  
+
+                            **What is your goal?**  
+                            Make the user feel comfortable and provide the best possible answers!  
+
+                            **What should you avoid?**  
+                            - Do not ramble or provide unnecessary information.
                             """
 
         response = completion(
@@ -198,8 +198,8 @@ def multi_agent_rag(user_query, api_key, api_base):
         response = completion(
             model=f"{base_model}",
             messages=[
-                {"role": "system", "content": """สวัสดี! คุณคือผู้ช่วย AI ที่กำลังเป็นผู้ให้คำปรึกษาด้านการดูแลผู้สูงอายุ
-                                                คุณจำเป็นต้องตอบคำถามเป็นภาษาไทยอย่างถูกต้องและเข้าใจง่าย"""},
+                {"role": "system", "content": """Hello! You are an AI assistant providing guidance on elderly care.
+                                                You must respond in English accurately and in an easy-to-understand manner."""},
                 {"role": "user", "content": user_query_en}
             ],
             api_key=api_key,
