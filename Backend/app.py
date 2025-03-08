@@ -138,8 +138,6 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8091)
     # Placeholder API credentials - replace with your own
-    api_key = "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"
-    api_base = "https://openrouter.ai/api/v1"
 
     base_model = "gpt-3.5-turbo"
     
@@ -147,6 +145,15 @@ if __name__ == "__main__":
 def read_root():
     return {"message": "Backend is running!"}
 
+from pydantic import BaseModel
+
+class ChatRequest(BaseModel):
+    message: str
+
 @app.post("/chat")
-def chat(user_input: dict):
-    return {"reply": f"คุณกล่าวว่า: {user_input.get('message', '')}"}
+def chat(request: ChatRequest):
+    response = multi_agent_rag(request.message, api_key, api_base)
+    return {"reply": response}
+
+api_key = "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"
+api_base = "https://openrouter.ai/api/v1"
