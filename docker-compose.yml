@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend  # ใช้ Dockerfile ในโฟลเดอร์ backend
+    build: ./Backend  # ใช้ Dockerfile ในโฟลเดอร์ backend
     container_name: backend_app
     ports:
       - "8091:8091"
@@ -13,7 +13,7 @@ services:
     stdin_open: true
 
   frontend:
-    build: ./frontend  # ใช้ Dockerfile ในโฟลเดอร์ frontend
+    build: ./Frontend  # ใช้ Dockerfile ในโฟลเดอร์ frontend
     container_name: frontend_app
     ports:
       - "8090:8090"
