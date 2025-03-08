@@ -39,7 +39,7 @@ def send_message(text, chat_id):
     if chat_id not in chat_histories:
         chat_histories[chat_id] = []
     if text.strip():
-        response = chatbot_response(text, chat_histories[chat_id])
+        response = send_message_to_backend(text)  # เรียกใช้งาน backend
         chat_histories[chat_id].append((text, response))
     return chat_histories[chat_id], ""
 
