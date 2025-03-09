@@ -25,7 +25,7 @@ services:
     depends_on:
       - backend
     
-  mongodb:
+    mongodb:
     image: mongo:7.0
     container_name: mongodb
     restart: always
@@ -33,4 +33,11 @@ services:
       - "27017:27017"
     volumes:
       - ./Database/mongo-data:/data/db  # เก็บข้อมูลให้ถาวร
+      - ./Database/init-scripts:/docker-entrypoint-initdb.d  # เพิ่มโฟลเดอร์สำหรับ script
+    command: >
+      bash -c "
+      mongod --fork --logpath /var/log/mongodb.log --bind_ip_all &&
+      sleep 5 &&
+      mongoimport --db MLOPs --collection knowledge_base --file /docker-entrypoint-initdb.d/elderly_care_knowledge_base.json --jsonArray &&
+      tail -f /dev/null"
 
