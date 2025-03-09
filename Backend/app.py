@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from sentence_transformers import SentenceTransformer
 import faiss
