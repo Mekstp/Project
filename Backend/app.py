@@ -8,9 +8,9 @@ from pymongo import MongoClient
 
 app = FastAPI()
 
-uri = "mongodb+srv://65070004:JzIEgg6DIv9gYYzH@cluster0.oyp1g.mongodb.net/?retryWrites=true&w=majority"
-
-client = MongoClient(uri)
+# ใช้ Environment Variable แทนค่าคงที่
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/MLOPs")
+client = MongoClient(MONGO_URI)
 
 db = client["MLOPs"]  
 collection = db["knowledge_base"]
@@ -28,6 +28,7 @@ client.close()
 
 # Load the SentenceTransformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
+base_model = "gpt-3.5-turbo"
 
 # Function to create a FAISS index for a list of documents
 def create_faiss_index(data):
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8091)
     # Placeholder API credentials - replace with your own
 
-    base_model = "gpt-3.5-turbo"
+    
     
 @app.get("/")
 def read_root():
