@@ -29,7 +29,7 @@ def send_message(text, chat_id):
     if chat_id not in chat_histories:
         chat_histories[chat_id] = []
     if text.strip():
-        response = chatbot_response(text, chat_histories[chat_id])
+        response = send_message_to_backend(text)  # เรียกใช้งาน backend
         chat_histories[chat_id].append((text, response))
     return chat_histories[chat_id], ""
 
@@ -62,7 +62,7 @@ with gr.Blocks(css="""
             new_chat_btn = gr.Button("New Chat")
 
         with gr.Column(scale=5):
-            chatbot = gr.Chatbot(value=chat_histories["Chat 1"], type="messages")
+            chatbot = gr.Chatbot(value=chat_histories["Chat 1"])
             textbox = gr.Textbox(placeholder="พิมพ์ข้อความที่นี่...")
             with gr.Row():
                 gr.Markdown("## 👩‍⚕️ Recommend : ")
@@ -90,5 +90,5 @@ with gr.Blocks(css="""
 
     # Select a chat to restore history
     chat_selector.change(lambda chat_id: chat_histories.get(chat_id, []), inputs=chat_selector, outputs=chatbot)
-    
+
 demo.launch(server_name="0.0.0.0", server_port=8090)
