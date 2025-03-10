@@ -16,16 +16,6 @@ def send_message_to_backend(user_input):
 chat_histories = {"Chat 1": []}
 chat_count = 1  # Start counting from 1
 
-# Chatbot response function
-def chatbot_response(message, history):
-    responses = {
-        "สวัสดี": "สวัสดีค่ะ! มีอะไรให้ช่วยไหมคะ?",
-        "วันนี้วันอะไร": f"วันนี้เป็นวันที่ {time.strftime('%d/%m/%Y')}",
-        "ฉันรู้สึกไม่ค่อยดี": "คุณรู้สึกอย่างไรบ้างคะ? ปวดหัว หรือมีอาการอื่น ๆ ไหม?",
-        "ขอบคุณ": "ยินดีค่ะ! ขอให้มีวันที่ดีนะคะ 😊"
-    }
-    return responses.get(message, "ขออภัย ฉันไม่เข้าใจคำถามค่ะ แต่ฉันสามารถช่วยดูแลคุณได้นะคะ")
-
 # Function to create a new chat
 def new_chat():
     global chat_count
@@ -39,7 +29,7 @@ def send_message(text, chat_id):
     if chat_id not in chat_histories:
         chat_histories[chat_id] = []
     if text.strip():
-        response = send_message_to_backend(text)  # เรียกใช้งาน backend
+        response = chatbot_response(text, chat_histories[chat_id])
         chat_histories[chat_id].append((text, response))
     return chat_histories[chat_id], ""
 
@@ -72,20 +62,27 @@ with gr.Blocks(css="""
             new_chat_btn = gr.Button("New Chat")
 
         with gr.Column(scale=5):
-            chatbot = gr.Chatbot(value=chat_histories["Chat 1"])
+            chatbot = gr.Chatbot(value=chat_histories["Chat 1"], type="messages")
             textbox = gr.Textbox(placeholder="พิมพ์ข้อความที่นี่...")
             with gr.Row():
                 gr.Markdown("## 👩‍⚕️ Recommend : ")
-                btn1 = gr.Button("สวัสดี")
-                btn2 = gr.Button("วันนี้วันอะไร")
-                btn3 = gr.Button("ฉันรู้สึกไม่ค่อยดี")
-                btn4 = gr.Button("ขอบคุณ")
+                btn1 = gr.Button("นอนไม่หลับ")
+                btn2 = gr.Button("อาหาร")
+                btn3 = gr.Button("ออกกำลังกาย")
+                btn4 = gr.Button("สถานที่")
 
     # Message sending buttons
-    btn1.click(send_message, inputs=[btn1, chat_selector], outputs=[chatbot, textbox])
-    btn2.click(send_message, inputs=[btn2, chat_selector], outputs=[chatbot, textbox])
-    btn3.click(send_message, inputs=[btn3, chat_selector], outputs=[chatbot, textbox])
-    btn4.click(send_message, inputs=[btn4, chat_selector], outputs=[chatbot, textbox])
+    btn1.click(lambda chat_id: send_message("ผู้สูงอายุที่นอนไม่หลับควรทำอย่างไร ?", chat_id),
+           inputs=[chat_selector], outputs=[chatbot, textbox])
+
+    btn2.click(lambda chat_id: send_message("ผู้สูงอายุควรกินอาหารประเภทใด ?", chat_id),
+           inputs=[chat_selector], outputs=[chatbot, textbox])
+
+    btn3.click(lambda chat_id: send_message("ผู้สูงอายุควรออกกำลังกายยังไง ให้ปลอดภัย", chat_id),
+           inputs=[chat_selector], outputs=[chatbot, textbox])
+
+    btn4.click(lambda chat_id: send_message("สถานที่ที่ผู้สูงอายุชอบไป", chat_id),
+           inputs=[chat_selector], outputs=[chatbot, textbox])
     textbox.submit(send_message, inputs=[textbox, chat_selector], outputs=[chatbot, textbox])
 
     # New chat button
@@ -93,5 +90,5 @@ with gr.Blocks(css="""
 
     # Select a chat to restore history
     chat_selector.change(lambda chat_id: chat_histories.get(chat_id, []), inputs=chat_selector, outputs=chatbot)
-
+    
 demo.launch(server_name="0.0.0.0", server_port=8090)
