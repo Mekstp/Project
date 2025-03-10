@@ -1,4 +1,5 @@
 import os
+import requests
 from fastapi import FastAPI
 from sentence_transformers import SentenceTransformer
 import faiss
@@ -9,8 +10,22 @@ from pymongo import MongoClient
 
 app = FastAPI()
 
-# ใช้ Environment Variable แทนค่าคงที่
+API_KEY = os.getenv("API_KEY")
+API_BASE = os.getenv("API_BASE")
+TRANSLATOR_URL = os.getenv("TRANSLATOR_URL", "http://translator:8092")
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/MLOPs")
+base_model = os.getenv("BASE_MODEL")
+
+def translate_text(text, source_lang="auto", target_lang="en"):
+    """
+    เรียกใช้ API ของ translator service เพื่อแปลข้อความ
+    """
+    try:
+        response = requests.get(f"{TRANSLATOR_URL}/translate", params={"text": text, "source_lang": source_lang, "target_lang": target_lang})
+        return response.json().get("translated_text", "แปลไม่สำเร็จ")
+    except Exception as e:
+        return f"เกิดข้อผิดพลาดในการแปล: {e}"
+
 client = MongoClient(MONGO_URI)
 
 db = client["MLOPs"]  
@@ -29,7 +44,6 @@ client.close()
 
 # Load the SentenceTransformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
-base_model = "gpt-3.5-turbo"
 
 # Function to create a FAISS index for a list of documents
 def create_faiss_index(data):
@@ -66,20 +80,6 @@ def determine_agent(user_query):
             break  # Use the first good match (could be modified to compare scores)
 
     return best_agent, best_match
-
-def translate_text(text, source_lang="auto", target_lang="en"):
-    """
-    แปลข้อความจากภาษาต้นทางไปยังภาษาปลายทางโดยใช้ GoogleTranslator จาก deep-translator
-
-    :param text: ข้อความที่ต้องการแปล
-    :param source_lang: ภาษาต้นทาง (ค่าเริ่มต้นเป็น "auto" ให้ระบบตรวจจับอัตโนมัติ)
-    :param target_lang: ภาษาปลายทาง (ค่าเริ่มต้นเป็น "en" - อังกฤษ)
-    :return: ข้อความที่ถูกแปล
-    """
-    try:
-        return GoogleTranslator(source=source_lang, target=target_lang).translate(text)
-    except Exception as e:
-        return f"เกิดข้อผิดพลาดในการแปล: {e}"
 
 def multi_agent_rag(user_query, api_key, api_base):
     # แปล user_query จากไทย -> อังกฤษ
@@ -156,6 +156,3 @@ class ChatRequest(BaseModel):
 def chat(request: ChatRequest):
     response = multi_agent_rag(request.message, api_key, api_base)
     return {"reply": response}
-
-api_key = "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"
-api_base = "https://openrouter.ai/api/v1"
