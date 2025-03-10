@@ -14,7 +14,7 @@ API_KEY = os.getenv("API_KEY")
 API_BASE = os.getenv("API_BASE")
 TRANSLATOR_URL = os.getenv("TRANSLATOR_URL", "http://translator:8092")
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017/MLOPs")
-base_model = os.getenv("BASE_MODEL")
+BASE_MODEL = os.getenv("BASE_MODEL")
 
 def translate_text(text, source_lang="auto", target_lang="en"):
     """
@@ -81,7 +81,7 @@ def determine_agent(user_query):
 
     return best_agent, best_match
 
-def multi_agent_rag(user_query, api_key, api_base):
+def multi_agent_rag(user_query, API_KEY, API_BASE):
     # แปล user_query จากไทย -> อังกฤษ
     user_query_en = translate_text(user_query, source_lang="th", target_lang="en")
 
@@ -107,13 +107,13 @@ def multi_agent_rag(user_query, api_key, api_base):
                             """
 
         response = completion(
-            model=f"{base_model}",
+            model=f"{BASE_MODEL}",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Use the following knowledge base context to answer: {retrieved_context}\n\n{user_query_en}"}
             ],
-            api_key=api_key,
-            api_base=api_base
+            API_KEY=API_KEY,
+            API_BASE=API_BASE
         )
 
         # แปล response กลับจากอังกฤษ -> ไทย
@@ -121,19 +121,19 @@ def multi_agent_rag(user_query, api_key, api_base):
         return f"[{agent.upper()} AGENT]: " + response_th
     else:
         response = completion(
-            model=f"{base_model}",
+            model=f"{BASE_MODEL}",
             messages=[
                 {"role": "system", "content": """Hello! You are an AI assistant providing guidance on elderly care.
                                                 You must respond in English accurately and in an easy-to-understand manner."""},
                 {"role": "user", "content": user_query_en}
             ],
-            api_key=api_key,
-            api_base=api_base
+            API_KEY=API_KEY,
+            API_BASE=API_BASE
         )
 
         # แปล response กลับจากอังกฤษ -> ไทย
         response_th = translate_text(response["choices"][0]["message"]["content"], source_lang="en", target_lang="th")
-        return "[GENERAL CHAT AGENT]: " + response_th
+        return response_th
 
 # Example usage
 if __name__ == "__main__":
@@ -154,5 +154,5 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    response = multi_agent_rag(request.message, api_key, api_base)
+    response = multi_agent_rag(request.message, API_KEY, API_BASE)
     return {"reply": response}
