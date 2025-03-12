@@ -43,8 +43,8 @@ with gr.Blocks(css="""
         border-radius: 8px; text-align: center; font-size: 14px;
     }
     .chatbox { flex: 1; padding: 10px; }
-    button { background: #F78FB3; color: white; border-radius: 5px; padding: 8px 15px; border: none; }
-    button:hover { background: #F37199; }
+    button { background: #6EACDA; color: White; border-radius: 5px; padding: 8px 15px; border: none; }
+    button:hover { background: #0F67B1; }
 """) as demo:
 
     # Header
